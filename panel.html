@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Panel · Código 12+1</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#FBF3F1">
+<meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Panel 12+1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,700;1,800;1,900&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --mostaza:#FFC21A; --tomate:#D42A1F; --tomate2:#B32117; --rosada:#FCE8E3; --rosada2:#F6D3CB;
@@ -35,7 +35,7 @@ a{color:inherit}
 
 /* ---------- Encabezado ---------- */
 .hero{background:var(--mostaza);padding:30px 22px 18px;position:relative}
-.logo{font-family:var(--display);font-weight:400;color:var(--carbon);line-height:.86;text-shadow:3px 3px 0 var(--tomate)}
+.logo{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--carbon);line-height:.86;text-shadow:3px 3px 0 var(--tomate)}
 .logo .l1{display:block;font-size:30px;letter-spacing:1px}
 .logo .l2{display:block;font-size:92px;letter-spacing:-2px;margin-left:-4px;text-shadow:5px 5px 0 var(--tomate)}
 .slogan{font-size:19px;font-weight:700;margin-top:14px;max-width:24ch;line-height:1.25}
@@ -56,11 +56,11 @@ a{color:inherit}
 
 /* ---------- Menú ---------- */
 .sec{padding:20px 16px 2px;scroll-margin-top:66px}
-.sec h2{font-family:var(--display);font-weight:400;font-size:25px;line-height:1.05;margin:0 4px 12px;color:var(--carbon)}
+.sec h2{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:.3px;font-size:25px;line-height:1.05;margin:0 4px 12px;color:var(--carbon)}
 .board{background:var(--blanco);border-radius:20px;border:1.5px solid var(--linea);overflow:hidden}
 .item{display:flex;align-items:center;gap:14px;padding:16px;cursor:pointer;position:relative}
 .item + .item{border-top:1.5px dashed var(--linea)}
-.item:active{background:#FFF8F6}
+.item:active{background:#FFFCF4}
 .item-txt{flex:1;min-width:0}
 .item h3{font-size:17px;font-weight:800;line-height:1.2}
 .item p{font-size:14px;color:var(--gris);line-height:1.4;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -96,7 +96,7 @@ a{color:inherit}
 .sheet-scroll{overflow-y:auto;flex:1;overscroll-behavior:contain}
 .sheet-img{width:100%;height:230px;object-fit:cover;display:block;border-radius:24px 24px 0 0}
 .sheet-body{padding:22px 18px 10px}
-.sheet h2{font-family:var(--display);font-weight:400;font-size:27px;line-height:1.05;padding-right:40px}
+.sheet h2{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:.3px;font-size:27px;line-height:1.05;padding-right:40px}
 .sheet-desc{color:var(--gris);font-size:15px;line-height:1.45;margin-top:8px}
 .sheet h4{font-size:15px;font-weight:800;margin:20px 0 9px}
 .vars{display:grid;gap:8px}
@@ -121,14 +121,14 @@ a{color:inherit}
 .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--mostaza)}
 .back{display:inline-flex;align-items:center;gap:4px;font-weight:700;padding:8px 12px 8px 6px;border-radius:12px;background:var(--blanco)}
 .back svg{width:20px;height:20px}
-.topbar h1{font-family:var(--display);font-weight:400;font-size:21px;margin-left:auto}
+.topbar h1{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:.3px;font-size:21px;margin-left:auto}
 .wrap{padding:18px 16px}
 .ticket-w{filter:drop-shadow(0 8px 16px rgba(42,27,20,.14))}
 .ticket{--s:7px;background:var(--blanco);padding:22px 18px 24px;
   -webkit-mask:radial-gradient(var(--s) at 50% 0,#0000 98%,#000) 50% 0/calc(2.4*var(--s)) 51% repeat-x,radial-gradient(var(--s) at 50% 100%,#0000 98%,#000) 50% 100%/calc(2.4*var(--s)) 51% repeat-x;
   mask:radial-gradient(var(--s) at 50% 0,#0000 98%,#000) 50% 0/calc(2.4*var(--s)) 51% repeat-x,radial-gradient(var(--s) at 50% 100%,#0000 98%,#000) 50% 100%/calc(2.4*var(--s)) 51% repeat-x}
 .t-head{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:2px dashed var(--carbon)}
-.t-head b{font-family:var(--display);font-weight:400;font-size:18px}
+.t-head b{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:.3px;font-size:18px}
 .t-head span{font-size:13px;color:var(--gris);font-weight:600}
 .t-item{display:flex;gap:12px;padding:13px 0;border-bottom:1.5px dashed var(--linea)}
 .t-main{flex:1;min-width:0}
@@ -146,7 +146,7 @@ a{color:inherit}
 .t-total small{font-size:13px;color:var(--gris);font-weight:600}
 
 .fsec{margin-top:26px}
-.fsec h3{font-family:var(--display);font-weight:400;font-size:19px;margin:0 2px 12px}
+.fsec h3{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:.3px;font-size:19px;margin:0 2px 12px}
 .f{display:block;margin-bottom:11px}
 .f > span{display:block;font-size:14px;font-weight:700;color:var(--carbon2);margin-bottom:6px}
 .f textarea{min-height:78px}
@@ -180,7 +180,7 @@ a{color:inherit}
 .okmark{width:86px;height:86px;margin:0 auto 18px;border-radius:50%;background:var(--verde);color:var(--blanco);display:grid;place-items:center;animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
 .okmark svg{width:44px;height:44px}
 @keyframes pop{from{transform:scale(.3);opacity:0}}
-.done h1{font-family:var(--display);font-weight:400;font-size:32px;line-height:1.05}
+.done h1{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:.3px;font-size:32px;line-height:1.05}
 .done > p{font-size:16.5px;line-height:1.5;margin:12px auto 0;max-width:32ch;color:var(--carbon2)}
 .done .ticket-w{margin:24px auto 0;max-width:300px}
 .done .ticket{text-align:center;padding:24px 18px}
@@ -194,7 +194,7 @@ a{color:inherit}
 .toast.show{transform:translate(-50%,0);opacity:1;visibility:visible}
 
 /* ---------- Panel ---------- */
-body.is-admin{background:#FBF3F1}
+body.is-admin{background:#FAF7F0}
 .admin{max-width:1060px;margin:0 auto;padding:0 16px 70px}
 .a-top{display:flex;align-items:center;gap:12px;padding:16px 0 12px;flex-wrap:wrap}
 .a-brand{font-family:var(--display);font-size:24px;line-height:1}
@@ -203,7 +203,7 @@ body.is-admin{background:#FBF3F1}
 .openbtn i{width:10px;height:10px;border-radius:50%;background:var(--tomate)}
 .openbtn.on{background:#E3F5EA;color:var(--verde2);border-color:#A9DDBE}
 .openbtn.on i{background:var(--verde)}
-.tabs{display:flex;gap:4px;border-bottom:1.5px solid var(--linea);margin-bottom:18px;position:sticky;top:0;background:#FBF3F1;z-index:10;overflow-x:auto}
+.tabs{display:flex;gap:4px;border-bottom:1.5px solid var(--linea);margin-bottom:18px;position:sticky;top:0;background:#FAF7F0;z-index:10;overflow-x:auto}
 .tabs button{padding:13px 14px 11px;font-weight:800;font-size:15.5px;border-bottom:3px solid transparent;margin-bottom:-1.5px;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
 .tabs button.on{border-color:var(--tomate)}
 .dotn{font-style:normal;background:var(--tomate);color:var(--blanco);font-size:12px;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center;padding:0 6px}
@@ -248,7 +248,7 @@ body.is-admin{background:#FBF3F1}
 .btn:disabled{opacity:.55}
 .empty{background:var(--blanco);border:1.5px dashed var(--linea);border-radius:16px;padding:34px 20px;text-align:center;color:var(--gris);font-size:15.5px;grid-column:1/-1}
 .empty .btn{margin:14px 4px 0}
-.a-cat{font-family:var(--display);font-weight:400;font-size:19px;margin:22px 2px 10px}
+.a-cat{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:.3px;font-size:19px;margin:22px 2px 10px}
 .a-prods{background:var(--blanco);border:1.5px solid var(--linea);border-radius:16px;overflow:hidden}
 .a-prod{display:flex;align-items:center;gap:12px;padding:11px 14px}
 .a-prod + .a-prod{border-top:1.5px dashed var(--linea)}
@@ -260,27 +260,27 @@ body.is-admin{background:#FBF3F1}
 .a-prod.off .a-info b{color:var(--gris);text-decoration:line-through}
 .sw{position:relative;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:700;color:var(--gris)}
 .sw input{position:absolute;opacity:0;width:1px;height:1px}
-.sw .tr{width:44px;height:26px;border-radius:13px;background:#E2C9C2;position:relative;transition:background .15s;flex:none}
+.sw .tr{width:44px;height:26px;border-radius:13px;background:#D9CFB8;position:relative;transition:background .15s;flex:none}
 .sw .tr::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--blanco);transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
 .sw input:checked + .tr{background:var(--verde)}
 .sw input:checked + .tr::after{transform:translateX(18px)}
 .sw input:focus-visible + .tr{outline:3px solid var(--carbon);outline-offset:2px}
 .a-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
 .card{background:var(--blanco);border:1.5px solid var(--linea);border-radius:18px;padding:18px}
-.card h3{font-family:var(--display);font-weight:400;font-size:18px;margin-bottom:14px}
+.card h3{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:.3px;font-size:18px;margin-bottom:14px}
 .card p.help{color:var(--gris);font-size:14px;line-height:1.45;margin:-6px 0 12px}
 .linkbox{display:flex;gap:6px;margin-bottom:10px}
-.linkbox input{flex:1;min-width:0;padding:10px 12px;border:1.5px solid var(--linea);border-radius:11px;background:#FFF8F6;font-size:14px}
+.linkbox input{flex:1;min-width:0;padding:10px 12px;border:1.5px solid var(--linea);border-radius:11px;background:#FFFCF4;font-size:14px}
 .qr{display:flex;gap:14px;align-items:center;margin-top:16px;padding-top:16px;border-top:1.5px dashed var(--linea)}
 .qr img{width:120px;height:120px;border-radius:10px;border:1.5px solid var(--linea);flex:none;background:var(--blanco)}
 .qr p{color:var(--gris);font-size:14px;line-height:1.4;margin:4px 0 10px}
 .chk{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;margin:6px 0 12px;cursor:pointer}
 .chk input{width:20px;height:20px;accent-color:var(--carbon)}
-.savebar{grid-column:1/-1;position:sticky;bottom:0;padding:12px 0;background:linear-gradient(transparent,#FBF3F1 30%)}
+.savebar{grid-column:1/-1;position:sticky;bottom:0;padding:12px 0;background:linear-gradient(transparent,#FAF7F0 30%)}
 .modal-w{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px}
 .modal-w .overlay{z-index:0}
 .modal{position:relative;z-index:1;background:var(--blanco);border-radius:22px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:22px 20px;animation:fade .2s ease}
-.modal h2{font-family:var(--display);font-weight:400;font-size:22px;margin-bottom:16px}
+.modal h2{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:.3px;font-size:22px;margin-bottom:16px}
 .e-photo{display:flex;gap:12px;align-items:flex-start}
 .e-photo img,.e-photo .noimg{width:96px;height:96px;border-radius:13px;object-fit:cover;flex:none;background:var(--rosada);display:grid;place-items:center;color:var(--gris);font-size:13px;font-weight:600}
 .e-photo .btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
@@ -297,7 +297,7 @@ body.is-admin{background:#FBF3F1}
 .login input{padding:14px;border:1.5px solid var(--linea);border-radius:13px;background:var(--blanco);outline:none}
 .login input:focus{border-color:var(--carbon);box-shadow:0 0 0 3px rgba(255,194,26,.55)}
 .setup{max-width:620px;margin:0 auto;padding:50px 20px}
-.setup h1{font-family:var(--display);font-weight:400;font-size:26px;margin-bottom:12px}
+.setup h1{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:.3px;font-size:26px;margin-bottom:12px}
 .setup p,.setup li{font-size:16px;line-height:1.55;color:var(--carbon2)}
 .setup ol{padding-left:22px;margin:14px 0}
 .setup li{margin-bottom:6px}
@@ -336,13 +336,13 @@ body.is-admin{background:#FBF3F1}
 .pk{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-top:1px dashed var(--linea)}
 .pk-n{flex:1;min-width:120px;font-weight:700;font-size:14.5px}
 .pk-b{display:flex;flex-wrap:wrap;gap:4px}
-.vsel{background:#FFF6F3;border-radius:14px;padding:10px 12px;margin-bottom:14px}
+.vsel{background:#FBF6EA;border-radius:14px;padding:10px 12px;margin-bottom:14px}
 .vs{display:flex;align-items:center;gap:10px;padding:5px 0}
 .vs > span{flex:1;font-weight:700;font-size:14.5px}
 .vs small{color:var(--gris);font-weight:600}
 .crow{display:grid;grid-template-columns:1fr 66px 84px 108px 38px;gap:6px;align-items:center}
 .crow input,.crow select,.rrow select,.rrow input{padding:10px 9px;border:1.5px solid var(--linea);border-radius:10px;width:100%;background:var(--blanco);font-size:15px;min-width:0}
-.crow select:disabled{background:#FBF3F1;color:var(--gris)}
+.crow select:disabled{background:#FAF7F0;color:var(--gris)}
 .c-x,.rrow button{border:1.5px solid var(--linea);border-radius:10px;height:42px;font-size:19px;color:var(--tomate2);background:var(--blanco)}
 .c-info{grid-column:1/-1;color:var(--gris);font-size:12.5px;min-height:6px;margin:2px 2px 8px}
 .rec{border:1.5px solid var(--linea);border-radius:14px;padding:10px 12px;margin-bottom:8px}
@@ -372,7 +372,7 @@ body.is-admin{background:#FBF3F1}
 .card.full{grid-column:1/-1}
 .vc{padding-left:64px;padding-top:18px}
 .vc-plot{height:190px;display:flex;align-items:stretch;gap:2px;position:relative;border-bottom:1.5px solid var(--carbon2)}
-.vc-g{position:absolute;left:0;right:0;border-top:1px solid #F1DDD7;pointer-events:none}
+.vc-g{position:absolute;left:0;right:0;border-top:1px solid #EAE1CC;pointer-events:none}
 .vc-g span{position:absolute;left:-64px;top:-9px;width:58px;text-align:right;font-size:11.5px;color:var(--gris);font-weight:600}
 .vc-b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;min-width:0;padding:0;position:relative;z-index:1}
 .vc-b i{display:block;width:100%;max-width:30px;background:var(--carbon);border-radius:4px 4px 0 0}
@@ -392,6 +392,34 @@ body.is-admin{background:#FBF3F1}
 }
 @media (max-width:760px){.stats{grid-template-columns:1fr 1fr}.a-grid{grid-template-columns:1fr}.orders{grid-template-columns:1fr}}
 @media (max-width:520px){.a-top{gap:8px}.a-brand{font-size:20px}.a-top .openbtn{order:3;width:100%;justify-content:center}.modal-w{align-items:flex-end;padding:0}.modal{border-radius:22px 22px 0 0;max-height:94vh;animation:up .28s cubic-bezier(.2,.9,.3,1)}.a-right .btn{padding:7px 9px}}
+
+/* ---------- Marca Código 12+1: negro y dorado ---------- */
+:root{--display:'Barlow Condensed','Arial Narrow',sans-serif;--rosada:#F5EFDF;--rosada2:#E9DDBF;--linea:#E6DCC4;--gris:#7D735E;--carbon:#1A1610;--carbon2:#4A4232;
+  --oro:#F9BE24;--oro-viejo:#C9A151;--bronce:#89633A;--dorado:linear-gradient(180deg,#FFE58A 0%,#F9BE24 48%,#C9901E 100%)}
+body.is-admin{background:#FAF7F0}
+.a-brand,.pk-cat,.a-ph{font-style:italic;font-weight:800;text-transform:uppercase}
+.a-brand{font-size:30px;letter-spacing:.3px;padding-bottom:2px;border-bottom:3px solid var(--oro)}
+.a-cat{font-size:23px}
+.card h3{font-size:22px}
+.modal h2{font-size:28px}
+.pk-cat{font-size:16px}
+.tabs button.on{border-color:var(--oro)}
+.btn.red{background:var(--dorado);color:#1A140C;border-color:var(--bronce)}
+.btn.red:disabled{opacity:.55}
+.chip.on,.pills button.on{background:#1A1610;color:var(--oro);border-color:#1A1610}
+.sw input:checked + .tr{background:#1F9D55}
+.vc-b:hover i,.vc-b:focus-visible i{background:var(--oro)}
+body.is-admin:has(.login),body.is-admin:has(.setup){background:#000}
+.login .logo{color:#fff;text-shadow:none;text-transform:none;font-weight:900}
+.login .logo .l1{font-size:48px;text-shadow:none}
+.login .logo .l2{font-size:104px;letter-spacing:-3px;background:var(--dorado);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 4px 0 #4A3416)}
+.login > p{color:#EEDC9E}
+.login input{background:#0B0907;border-color:#3A3122;color:#fff}
+.login input:focus{border-color:var(--oro);box-shadow:0 0 0 3px rgba(249,190,36,.25)}
+.login .err{background:rgba(255,107,94,.1);color:#FFC2BA;border-color:rgba(255,107,94,.45)}
+.setup h1{color:var(--oro)}
+.setup p,.setup li{color:#D3C8AB}
+.setup b{color:#fff}
 </style>
 </head>
 <body class="is-admin">
@@ -436,28 +464,30 @@ const DEFAULT_CONFIG = {
   domicilio: 0,          // 0 = el valor del domicilio se confirma por WhatsApp
   pedidoMinimo: 0,
   recoger: true,
-  categorias: ['Salchipapas', 'Perros', 'Hamburguesas', 'Chuzo desgranado', 'Bebidas', 'Adicionales'],
+  categorias: ['Salchipapas', 'Perros calientes', 'Hamburguesas', 'Chuzos desgranados', 'Adicionales', 'Postres'],
   nequi: '', daviplata: '', breb: '', bancolombia: ''
 };
 
 const DEFAULT_MENU = [
-  {id:'salchi-clasica', cat:'Salchipapas', nombre:'Salchipapa clásica', desc:'Papa a la francesa, salchicha ranchera, queso costeño rallado y salsas de la casa.', variantes:[{n:'Personal',p:12000},{n:'Mediana',p:18000},{n:'Familiar',p:32000}], orden:1},
-  {id:'salchi-especial', cat:'Salchipapas', nombre:'Salchipapa especial', desc:'La clásica más pollo desmechado, tocineta, maicitos y queso gratinado.', variantes:[{n:'Personal',p:16000},{n:'Mediana',p:24000},{n:'Familiar',p:42000}], orden:2},
-  {id:'salchi-codigo', cat:'Salchipapas', nombre:'Salchipapa Código 12+1', desc:'La de la casa: carne, pollo, chorizo, tocineta, huevos de codorniz, maicitos y doble queso gratinado.', variantes:[{n:'Personal',p:20000},{n:'Familiar',p:50000}], orden:3},
-  {id:'perro-sencillo', cat:'Perros', nombre:'Perro sencillo', desc:'Pan suave, salchicha, papita ripio, queso costeño y salsas.', precio:9000, orden:1},
-  {id:'perro-especial', cat:'Perros', nombre:'Perro especial', desc:'Salchicha, tocineta, queso gratinado, papita ripio y salsas.', precio:13000, orden:2},
-  {id:'perro-suizo', cat:'Perros', nombre:'Perro suizo', desc:'Salchicha suiza, queso gratinado, tocineta, cebolla grillé y salsas.', precio:15000, orden:3},
-  {id:'hamb-clasica', cat:'Hamburguesas', nombre:'Hamburguesa clásica', desc:'Carne de res de 150 g, queso, lechuga, tomate, cebolla y salsas. Viene con papas.', precio:16000, orden:1},
-  {id:'hamb-doble', cat:'Hamburguesas', nombre:'Hamburguesa doble', desc:'Doble carne, doble queso, tocineta, lechuga y tomate. Viene con papas.', precio:23000, orden:2},
-  {id:'hamb-pollo', cat:'Hamburguesas', nombre:'Hamburguesa de pollo', desc:'Pechuga a la plancha, queso, lechuga, tomate y salsa de la casa. Viene con papas.', precio:17000, orden:3},
-  {id:'chuzo-desgranado', cat:'Chuzo desgranado', nombre:'Chuzo desgranado', desc:'Maíz desgranado, papita ripio, queso gratinado y salsas de la casa, con su bollo. Elige la proteína.', variantes:[{n:'Pollo',p:18000},{n:'Carne',p:19000},{n:'Mixto',p:21000}], orden:1},
-  {id:'gaseosa-personal', cat:'Bebidas', nombre:'Gaseosa personal', desc:'400 ml.', precio:3500, orden:1},
-  {id:'gaseosa-15', cat:'Bebidas', nombre:'Gaseosa 1,5 L', desc:'Para compartir.', precio:7500, orden:2},
-  {id:'agua', cat:'Bebidas', nombre:'Agua', desc:'600 ml.', precio:2500, orden:3},
-  {id:'add-queso', cat:'Adicionales', nombre:'Queso gratinado extra', desc:'', precio:3000, orden:1},
-  {id:'add-tocineta', cat:'Adicionales', nombre:'Tocineta extra', desc:'', precio:3000, orden:2},
-  {id:'add-codorniz', cat:'Adicionales', nombre:'Huevos de codorniz', desc:'', precio:2500, orden:3},
-  {id:'add-papas', cat:'Adicionales', nombre:'Porción de papas', desc:'', precio:5000, orden:4}
+  {id:'salchi-sencilla', cat:'Salchipapas', nombre:'Salchipapa sencilla', desc:'Papa, salchicha y queso costeño.', precio:16000, orden:1},
+  {id:'salchi-suiza', cat:'Salchipapas', nombre:'Salchipapa suiza', desc:'Papa, salchicha suiza y queso costeño.', precio:22000, orden:2},
+  {id:'salchi-pollo', cat:'Salchipapas', nombre:'Salchipapa de pollo', desc:'Papa, salchicha, pollo y queso costeño.', precio:27000, orden:3},
+  {id:'salchi-carne', cat:'Salchipapas', nombre:'Salchipapa de carne', desc:'Papa, salchicha, lomito de res y queso costeño.', precio:29000, orden:4},
+  {id:'salchi-mixta', cat:'Salchipapas', nombre:'Salchipapa mixta', desc:'Papa, salchicha, lomito de res, pollo y queso costeño.', precio:32000, orden:5},
+  {id:'salchi-combinada', cat:'Salchipapas', nombre:'Salchipapa combinada', desc:'Papa, salchicha, butifarra, chorizo y queso costeño.', precio:25000, orden:6},
+  {id:'perro-sencillo', cat:'Perros calientes', nombre:'Perro sencillo', desc:'Pan, salchicha, papa chongo, queso costeño y salsas.', precio:9000, orden:1},
+  {id:'perro-suizo', cat:'Perros calientes', nombre:'Perro suizo', desc:'Pan, salchicha suiza, papa chongo, queso costeño y salsas.', precio:18000, orden:2},
+  {id:'perro-gemelo', cat:'Perros calientes', nombre:'Perro gemelo', desc:'Pan, doble salchicha, papa chongo, queso costeño y salsas.', precio:13000, orden:3},
+  {id:'perro-italo-suizo', cat:'Perros calientes', nombre:'Perro ítalo suizo', desc:'Pan, salchicha suiza, queso italiano, papa chongo y salsas.', precio:20000, orden:4},
+  {id:'hamb-sencilla', cat:'Hamburguesas', nombre:'Hamburguesa sencilla', desc:'Pan, carne de res, queso costeño, papa chongo, lechuga, tomate y salsas.', precio:18000, orden:1},
+  {id:'hamb-pollo', cat:'Hamburguesas', nombre:'Hamburguesa de pollo', desc:'Pan, pechuga asada, queso costeño, papa chongo, lechuga, tomate y salsas.', precio:18000, orden:2},
+  {id:'hamb-doble', cat:'Hamburguesas', nombre:'Hamburguesa doble carne', desc:'Pan, doble carne de res, queso costeño, tocineta, papa chongo, lechuga, tomate y salsas.', precio:26000, orden:3},
+  {id:'chuzo-desgranado', cat:'Chuzos desgranados', nombre:'Chuzo desgranado', desc:'Bollo, lechuga, papa chongo, queso costeño y salsas de la casa. Elige la proteína.', variantes:[{n:'Pollo',p:24000},{n:'Lomito de res',p:26000},{n:'Mixto',p:25000}], orden:1},
+  {id:'add-tocineta', cat:'Adicionales', nombre:'Adicional de tocineta', desc:'', precio:6000, orden:1},
+  {id:'add-gratinado', cat:'Adicionales', nombre:'Adicional de gratinado', desc:'', precio:5000, orden:2},
+  {id:'add-papas', cat:'Adicionales', nombre:'Porción de papas', desc:'', precio:8000, orden:3},
+  {id:'add-papas-maquillada', cat:'Adicionales', nombre:'Porción de papas maquillada', desc:'', precio:10000, orden:4},
+  {id:'churros', cat:'Postres', nombre:'Churros', desc:'Elige la talla.', variantes:[{n:'Talla M (8 und)',p:8000},{n:'Talla L (16 und)',p:15000},{n:'Talla XL (24 und)',p:22000}], orden:1}
 ];
 
 const CORTE = 5;   // la jornada del panel va de 5:00 a. m. a 5:00 a. m. (los pedidos de madrugada cuentan para la noche anterior)
@@ -510,7 +540,7 @@ async function initFirebase(withAuth){
 
 function logoHTML(nombre){
   const m = String(nombre).match(/^(.*?)\s*(\d[\d+\s]*)$/);
-  if (m && m[1]) return `<span class="l1">${esc(m[1])}</span><span class="l2">${esc(m[2].replace(/\s/g,''))}</span>`;
+  if (m && m[1]){ const n = esc(m[2].replace(/\s/g, '')); return `<span class="l1">${esc(m[1])}</span><span class="l2" data-t="${n}">${n}</span>`; }
   return `<span class="l1" style="font-size:44px">${esc(nombre)}</span>`;
 }
 const prettyTel = t => { const d = telLocal(t); return d.length === 10 ? `${d.slice(0,3)} ${d.slice(3,6)} ${d.slice(6)}` : t; };
@@ -724,10 +754,10 @@ function margenText(p){
   return parts.length ? `Ganas ${parts.join(', ')}` : '';
 }
 function viewMenu(){
-  if (!A.prods.length) return `<div class="empty"><p>Tu menú en la nube está vacío. Mientras tanto los clientes ven el menú de ejemplo.</p>
-    <button class="btn pri" data-act="a-seed">Cargar el menú de ejemplo para editarlo</button><button class="btn" data-act="a-new">Crear producto</button></div>`;
+  if (!A.prods.length) return `<div class="empty"><p>Tu menú todavía no está en la nube. Cárgalo para poder cambiar precios, subir fotos y poner recetas.</p>
+    <button class="btn pri" data-act="a-seed">Cargar mi menú</button><button class="btn" data-act="a-new">Crear producto</button></div>`;
   const cats = catsOrdered(A.prods, A.cfg.categorias);
-  return `<div class="a-tools"><button class="btn red" data-act="a-new">Agregar producto</button><span class="help">Apaga el interruptor cuando algo se acabe. En Editar pones la receta para saber cuánto ganas por plato.</span></div>` +
+  return `<div class="a-tools"><button class="btn red" data-act="a-new">Agregar producto</button><button class="btn sm ghost" data-act="a-seed">Reemplazar por el menú oficial</button><span class="help">Apaga el interruptor cuando algo se acabe. En Editar pones la receta para saber cuánto ganas por plato.</span></div>` +
     cats.map(cat => `<h3 class="a-cat">${esc(cat)}</h3><div class="a-prods">${A.prods.filter(p => p.cat === cat).sort(byOrden).map(p => { const mg = margenText(p); return `
       <div class="a-prod ${p.disponible === false ? 'off' : ''}">
         <div class="a-ph">${p.foto ? `<img src="${esc(p.foto)}" alt="">` : esc((p.nombre || '?')[0])}</div>
@@ -841,10 +871,13 @@ function compressImage(file, max = 720, q = .72){
   });
 }
 async function seedMenu(){
+  if (A.prods.length && !confirm('Esto reemplaza todos los productos que tienes ahora por el menú oficial (precios, fotos y recetas de los productos actuales se borran). ¿Continuar?')) return;
   const {writeBatch, doc} = fb.fs, b = writeBatch(fb.db);
-  normMenu(DEFAULT_MENU).forEach(({id, ...d}) => b.set(doc(fb.db, 'productos', id), d));
-  b.set(doc(fb.db, 'config', 'negocio'), {...A.cfg}, {merge: true});
-  try { await b.commit(); toast('Menú cargado. Ahora pon tus precios y fotos.'); } catch (e){ toast('No se pudo cargar: ' + e.code); }
+  const nuevos = normMenu(DEFAULT_MENU), ids = nuevos.map(p => p.id);
+  A.prods.forEach(p => { if (!ids.includes(p.id)){ b.delete(doc(fb.db, 'productos', p.id)); if (A.recetas[p.id]) b.delete(doc(fb.db, 'recetas', p.id)); } });
+  nuevos.forEach(({id, ...d}) => { const ya = A.prods.find(p => p.id === id); b.set(doc(fb.db, 'productos', id), ya?.foto ? {...d, foto: ya.foto} : d); });
+  b.set(doc(fb.db, 'config', 'negocio'), {...A.cfg, categorias: DEFAULT_CONFIG.categorias}, {merge: true});
+  try { await b.commit(); toast('Menú oficial cargado. Ahora sube las fotos.'); } catch (e){ toast('No se pudo cargar: ' + e.code); }
 }
 
 /* =====================================================================
@@ -870,16 +903,13 @@ const CANALES = ['Link de pedidos', 'WhatsApp', 'Rappi', 'DiDi Food', 'Recoge en
 const PAGOS = ['Efectivo', 'Nequi', 'Daviplata', 'Bre-B', 'Transferencia', 'Datáfono', 'Crédito'];
 const MOTIVOS = ['Conteo de inventario', 'Se dañó o se botó', 'Consumo del personal', 'Cortesía', 'Otro'];
 const BASE_INSUMOS = [
-  ['Papa', 'kg', 'Papas y verduras', 10], ['Salchicha ranchera', 'und', 'Proteínas', 30], ['Salchicha suiza', 'und', 'Proteínas', 10],
-  ['Carne de hamburguesa', 'und', 'Proteínas', 15], ['Pechuga de pollo', 'kg', 'Proteínas', 3], ['Carne de res', 'kg', 'Proteínas', 3],
-  ['Chorizo', 'und', 'Proteínas', 10], ['Tocineta', 'kg', 'Proteínas', 1], ['Huevos de codorniz', 'und', 'Proteínas', 30],
-  ['Queso costeño', 'kg', 'Lácteos', 2], ['Queso mozzarella', 'kg', 'Lácteos', 2],
-  ['Pan de perro', 'und', 'Panadería', 20], ['Pan de hamburguesa', 'und', 'Panadería', 15], ['Bollo', 'und', 'Panadería', 10],
-  ['Maíz tierno', 'kg', 'Papas y verduras', 2], ['Papita ripio', 'kg', 'Papas y verduras', 1], ['Lechuga', 'und', 'Papas y verduras', 2],
-  ['Tomate', 'kg', 'Papas y verduras', 1], ['Cebolla', 'kg', 'Papas y verduras', 1],
-  ['Salsa rosada', 'L', 'Salsas y aderezos', 1], ['Salsa de tomate', 'L', 'Salsas y aderezos', 1], ['Mostaza', 'L', 'Salsas y aderezos', 1], ['Aceite', 'L', 'Otros', 5],
-  ['Gaseosa personal', 'und', 'Bebidas', 12], ['Gaseosa 1,5 L', 'und', 'Bebidas', 6], ['Agua', 'und', 'Bebidas', 12],
-  ['Caja para salchipapa', 'und', 'Empaques', 30], ['Bolsa para domicilio', 'und', 'Empaques', 50], ['Servilletas', 'paquete', 'Empaques', 2]
+  ['Papa', 'kg', 'Papas y verduras', 10], ['Papa chongo', 'kg', 'Papas y verduras', 2], ['Lechuga', 'und', 'Papas y verduras', 2], ['Tomate', 'kg', 'Papas y verduras', 1],
+  ['Salchicha', 'und', 'Proteínas', 40], ['Salchicha suiza', 'und', 'Proteínas', 15], ['Butifarra', 'und', 'Proteínas', 15], ['Chorizo', 'und', 'Proteínas', 15],
+  ['Pollo', 'kg', 'Proteínas', 3], ['Lomito de res', 'kg', 'Proteínas', 3], ['Carne de hamburguesa', 'und', 'Proteínas', 15], ['Pechuga para hamburguesa', 'und', 'Proteínas', 10], ['Tocineta', 'kg', 'Proteínas', 1],
+  ['Queso costeño', 'kg', 'Lácteos', 3], ['Queso italiano', 'kg', 'Lácteos', 1], ['Queso para gratinar', 'kg', 'Lácteos', 1],
+  ['Pan de perro', 'und', 'Panadería', 20], ['Pan de hamburguesa', 'und', 'Panadería', 15], ['Bollo', 'und', 'Panadería', 10], ['Masa para churros', 'kg', 'Panadería', 1],
+  ['Salsa rosada', 'L', 'Salsas y aderezos', 1], ['Salsa de tomate', 'L', 'Salsas y aderezos', 1], ['Salsa de la casa', 'L', 'Salsas y aderezos', 1], ['Aceite', 'L', 'Otros', 5],
+  ['Bandeja o caja para salchipapa', 'und', 'Empaques', 30], ['Caja para hamburguesa', 'und', 'Empaques', 20], ['Bolsa para domicilio', 'und', 'Empaques', 50], ['Servilletas', 'paquete', 'Empaques', 2], ['Tenedores', 'paquete', 'Empaques', 1]
 ];
 
 /* ---- suscripciones ---- */
@@ -1486,7 +1516,7 @@ document.addEventListener('click', async e => {
     case 'a-notif': try { await Notification.requestPermission(); } catch (x){} renderAdminBody(); break;
     case 'a-new': openEdit(null); break;
     case 'a-edit': openEdit(id); break;
-    case 'a-seed': el.disabled = true; await seedMenu(); break;
+    case 'a-seed': await seedMenu(); break;
     case 'e-close': case 'm-close': closeModal(); break;
     case 'e-addrec': { readEdit(); const k = el.dataset.v; (A.edit.rec[k] = A.edit.rec[k] || []).push({i: '', c: 0}); $('#e-rec').innerHTML = recetaHTML(A.edit.p); break; }
     case 'e-delrec': { readEdit(); const k = el.dataset.v; (A.edit.rec[k] || []).splice(+el.dataset.j, 1); $('#e-rec').innerHTML = recetaHTML(A.edit.p); break; }

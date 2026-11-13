@@ -370,6 +370,9 @@ body.is-admin{background:#FAF7F0}
 .mtab th:first-child,.mtab td:first-child{text-align:left}
 .mtab td{text-align:right;padding:8px 4px;border-bottom:1px dashed var(--linea)}
 .card.full{grid-column:1/-1}
+.pasos{padding-left:20px;margin:0 0 12px;color:var(--carbon2);font-size:14.5px;line-height:1.5}
+.pasos li{margin-bottom:6px}
+.pasos a{font-weight:700}
 .vc{padding-left:64px;padding-top:18px}
 .vc-plot{height:190px;display:flex;align-items:stretch;gap:2px;position:relative;border-bottom:1.5px solid var(--carbon2)}
 .vc-g{position:absolute;left:0;right:0;border-top:1px solid #EAE1CC;pointer-events:none}
@@ -465,7 +468,8 @@ const DEFAULT_CONFIG = {
   pedidoMinimo: 0,
   recoger: true,
   categorias: ['Salchipapas', 'Perros calientes', 'Hamburguesas', 'Chuzos desgranados', 'Adicionales', 'Postres'],
-  nequi: '', daviplata: '', breb: '', bancolombia: ''
+  nequi: '', daviplata: '', breb: '', bancolombia: '',
+  cmbKey: ''   // clave de CallMeBot para el aviso automático a tu WhatsApp (se pone en Ajustes del panel)
 };
 
 const DEFAULT_MENU = [
@@ -482,12 +486,16 @@ const DEFAULT_MENU = [
   {id:'hamb-sencilla', cat:'Hamburguesas', nombre:'Hamburguesa sencilla', desc:'Pan, carne de res, queso costeño, papa chongo, lechuga, tomate y salsas.', precio:18000, orden:1},
   {id:'hamb-pollo', cat:'Hamburguesas', nombre:'Hamburguesa de pollo', desc:'Pan, pechuga asada, queso costeño, papa chongo, lechuga, tomate y salsas.', precio:18000, orden:2},
   {id:'hamb-doble', cat:'Hamburguesas', nombre:'Hamburguesa doble carne', desc:'Pan, doble carne de res, queso costeño, tocineta, papa chongo, lechuga, tomate y salsas.', precio:26000, orden:3},
-  {id:'chuzo-desgranado', cat:'Chuzos desgranados', nombre:'Chuzo desgranado', desc:'Bollo, lechuga, papa chongo, queso costeño y salsas de la casa. Elige la proteína.', variantes:[{n:'Pollo',p:24000},{n:'Lomito de res',p:26000},{n:'Mixto',p:25000}], orden:1},
+  {id:'chuzo-pollo', cat:'Chuzos desgranados', nombre:'Chuzo desgranado de pollo', desc:'Bollo, lechuga, papa chongo, queso costeño y salsas de la casa.', precio:24000, orden:1},
+  {id:'chuzo-lomito', cat:'Chuzos desgranados', nombre:'Chuzo desgranado de lomito de res', desc:'Bollo, lechuga, papa chongo, queso costeño y salsas de la casa.', precio:26000, orden:2},
+  {id:'chuzo-mixto', cat:'Chuzos desgranados', nombre:'Chuzo desgranado mixto', desc:'Bollo, lechuga, papa chongo, queso costeño y salsas de la casa.', precio:25000, orden:3},
   {id:'add-tocineta', cat:'Adicionales', nombre:'Adicional de tocineta', desc:'', precio:6000, orden:1},
   {id:'add-gratinado', cat:'Adicionales', nombre:'Adicional de gratinado', desc:'', precio:5000, orden:2},
   {id:'add-papas', cat:'Adicionales', nombre:'Porción de papas', desc:'', precio:8000, orden:3},
   {id:'add-papas-maquillada', cat:'Adicionales', nombre:'Porción de papas maquillada', desc:'', precio:10000, orden:4},
-  {id:'churros', cat:'Postres', nombre:'Churros', desc:'Elige la talla.', variantes:[{n:'Talla M (8 und)',p:8000},{n:'Talla L (16 und)',p:15000},{n:'Talla XL (24 und)',p:22000}], orden:1}
+  {id:'churros-m', cat:'Postres', nombre:'Churros talla M', desc:'8 unidades.', precio:8000, orden:1},
+  {id:'churros-l', cat:'Postres', nombre:'Churros talla L', desc:'16 unidades.', precio:15000, orden:2},
+  {id:'churros-xl', cat:'Postres', nombre:'Churros talla XL', desc:'24 unidades.', precio:22000, orden:3}
 ];
 
 const CORTE = 5;   // la jornada del panel va de 5:00 a. m. a 5:00 a. m. (los pedidos de madrugada cuentan para la noche anterior)
@@ -1473,6 +1481,16 @@ function viewAjustes(){
       ${fld('breb', 'Llave Bre-B', c.breb, 'Tu llave (celular, cédula, correo…)')}
       ${fld('bancolombia', 'Cuenta Bancolombia', c.bancolombia, 'Ahorros 000-000000-00 a nombre de…')}
     </section>
+    <section class="card full"><h3>Aviso automático a tu WhatsApp</h3>
+      <p class="help">Cada pedido nuevo te llega como mensaje de WhatsApp a tu número (${esc(prettyTel(c.whatsapp))}), aunque no tengas el panel abierto. Usa CallMeBot, un servicio gratuito. Se activa una sola vez:</p>
+      <ol class="pasos">
+        <li>Abre <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" rel="noopener">la página de CallMeBot</a> y guarda en tus contactos el número que aparece ahí.</li>
+        <li>Desde el WhatsApp del negocio envíale este mensaje, en inglés y tal cual: <b>I allow callmebot to send me messages</b></li>
+        <li>En uno o dos minutos te responde con tu <b>APIKEY</b> (un número). Pégalo aquí, guarda los ajustes y toca <b>Probar aviso</b>.</li>
+      </ol>
+      <div class="linkbox"><input id="c-cmbKey" value="${esc(c.cmbKey || '')}" placeholder="Tu APIKEY de CallMeBot" inputmode="numeric"><button class="btn sm" data-act="a-cmbtest">Probar aviso</button></div>
+      <p class="help">${c.cmbKey ? 'Activo: los pedidos nuevos te llegan también por WhatsApp.' : 'Sin activar: los pedidos solo suenan en este panel.'}</p>
+    </section>
     <div class="savebar"><button class="btn red big" data-act="a-savecfg" id="c-save">Guardar ajustes</button></div>
   </div>`;
 }
@@ -1483,7 +1501,8 @@ async function saveCfg(){
     horario: g('horario'), zona: g('zona'), aviso: g('aviso'),
     domicilio: parseMoney(g('domicilio')), pedidoMinimo: parseMoney(g('pedidoMinimo')), recoger: $('#c-recoger').checked,
     categorias: g('categorias').split('\n').map(s => s.trim()).filter(Boolean),
-    nequi: g('nequi'), daviplata: g('daviplata'), breb: g('breb'), bancolombia: g('bancolombia')
+    nequi: g('nequi'), daviplata: g('daviplata'), breb: g('breb'), bancolombia: g('bancolombia'),
+    cmbKey: digits(g('cmbKey')) || g('cmbKey')
   };
   if (telLocal(data.whatsapp).length !== 10) return toast('Revisa el número de WhatsApp: deben ser 10 dígitos');
   const {doc, setDoc} = fb.fs, b = $('#c-save'); b.disabled = true; b.textContent = 'Guardando…';
@@ -1572,6 +1591,14 @@ document.addEventListener('click', async e => {
       break;
     }
     case 'a-savecfg': saveCfg(); break;
+    case 'a-cmbtest': {
+      const key = ($('#c-cmbKey')?.value || '').trim(), tel = waNum(($('#c-whatsapp')?.value || A.cfg.whatsapp));
+      if (!key) { toast('Primero pega tu APIKEY de CallMeBot'); break; }
+      const txt = `✅ Prueba de ${A.cfg.nombre || DEFAULT_CONFIG.nombre}: así te van a llegar los pedidos nuevos.`;
+      try { await fetch(`https://api.callmebot.com/whatsapp.php?phone=%2B${tel}&apikey=${encodeURIComponent(key)}&text=${encodeURIComponent(txt)}`, {mode: 'no-cors'}); } catch (x){}
+      toast('Enviado. Revisa tu WhatsApp; si no llega en un minuto, revisa la APIKEY.');
+      break;
+    }
     case 'a-copy': { const v = $('#c-link').value; try { await navigator.clipboard.writeText(v); toast('Link copiado'); } catch (x){ $('#c-link').select(); document.execCommand('copy'); toast('Link copiado'); } break; }
   }
 });

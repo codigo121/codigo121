@@ -70,6 +70,11 @@ a{color:inherit}
 .item h3{font-size:17px;font-weight:800;line-height:1.2;color:var(--blanco)}
 .item p{font-size:14px;color:var(--gris);line-height:1.4;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .item-price{margin-top:7px;font-weight:800;font-size:17px;color:var(--crema2)}
+.vchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.vchip{font-size:13.5px;font-weight:600;color:var(--texto2);border:1px solid var(--linea);background:rgba(255,255,255,.03);border-radius:99px;padding:5px 11px;text-align:left}
+.vchip b{color:var(--crema2);font-weight:800;margin-left:2px}
+.vchip:active{border-color:var(--oro)}
+.vchip:disabled{opacity:.5}
 .item-price small{font-weight:600;color:var(--gris);font-size:13px}
 .agotado{display:inline-block;margin-left:8px;font-size:12px;font-weight:800;color:var(--mal);border:1px solid rgba(255,107,94,.4);padding:1px 8px;border-radius:6px}
 .item.off{cursor:default}
@@ -191,7 +196,7 @@ a{color:inherit}
 @keyframes pop{from{transform:scale(.3);opacity:0}}
 .done h1{font-family:var(--display);font-style:italic;font-weight:900;font-size:40px;line-height:1;text-transform:uppercase;color:var(--blanco)}
 .done > p{font-size:16.5px;line-height:1.5;margin:12px auto 0;max-width:32ch;color:var(--texto2)}
-.done > p b{color:var(--oro)}
+.done > p b{color:var(--oro);white-space:nowrap}
 .done .ticket-w{margin:26px auto 0;max-width:300px}
 .done .ticket{text-align:center;padding:24px 18px}
 .done .num{font-family:var(--display);font-style:italic;font-weight:900;font-size:44px;margin:4px 0}
@@ -248,7 +253,8 @@ const DEFAULT_CONFIG = {
   pedidoMinimo: 0,
   recoger: true,
   categorias: ['Salchipapas', 'Perros calientes', 'Hamburguesas', 'Chuzos desgranados', 'Adicionales', 'Postres'],
-  nequi: '', daviplata: '', breb: '', bancolombia: ''
+  nequi: '', daviplata: '', breb: '', bancolombia: '',
+  cmbKey: ''   // clave de CallMeBot para el aviso automático a tu WhatsApp (se pone en Ajustes del panel)
 };
 
 const DEFAULT_MENU = [
@@ -265,12 +271,16 @@ const DEFAULT_MENU = [
   {id:'hamb-sencilla', cat:'Hamburguesas', nombre:'Hamburguesa sencilla', desc:'Pan, carne de res, queso costeño, papa chongo, lechuga, tomate y salsas.', precio:18000, orden:1},
   {id:'hamb-pollo', cat:'Hamburguesas', nombre:'Hamburguesa de pollo', desc:'Pan, pechuga asada, queso costeño, papa chongo, lechuga, tomate y salsas.', precio:18000, orden:2},
   {id:'hamb-doble', cat:'Hamburguesas', nombre:'Hamburguesa doble carne', desc:'Pan, doble carne de res, queso costeño, tocineta, papa chongo, lechuga, tomate y salsas.', precio:26000, orden:3},
-  {id:'chuzo-desgranado', cat:'Chuzos desgranados', nombre:'Chuzo desgranado', desc:'Bollo, lechuga, papa chongo, queso costeño y salsas de la casa. Elige la proteína.', variantes:[{n:'Pollo',p:24000},{n:'Lomito de res',p:26000},{n:'Mixto',p:25000}], orden:1},
+  {id:'chuzo-pollo', cat:'Chuzos desgranados', nombre:'Chuzo desgranado de pollo', desc:'Bollo, lechuga, papa chongo, queso costeño y salsas de la casa.', precio:24000, orden:1},
+  {id:'chuzo-lomito', cat:'Chuzos desgranados', nombre:'Chuzo desgranado de lomito de res', desc:'Bollo, lechuga, papa chongo, queso costeño y salsas de la casa.', precio:26000, orden:2},
+  {id:'chuzo-mixto', cat:'Chuzos desgranados', nombre:'Chuzo desgranado mixto', desc:'Bollo, lechuga, papa chongo, queso costeño y salsas de la casa.', precio:25000, orden:3},
   {id:'add-tocineta', cat:'Adicionales', nombre:'Adicional de tocineta', desc:'', precio:6000, orden:1},
   {id:'add-gratinado', cat:'Adicionales', nombre:'Adicional de gratinado', desc:'', precio:5000, orden:2},
   {id:'add-papas', cat:'Adicionales', nombre:'Porción de papas', desc:'', precio:8000, orden:3},
   {id:'add-papas-maquillada', cat:'Adicionales', nombre:'Porción de papas maquillada', desc:'', precio:10000, orden:4},
-  {id:'churros', cat:'Postres', nombre:'Churros', desc:'Elige la talla.', variantes:[{n:'Talla M (8 und)',p:8000},{n:'Talla L (16 und)',p:15000},{n:'Talla XL (24 und)',p:22000}], orden:1}
+  {id:'churros-m', cat:'Postres', nombre:'Churros talla M', desc:'8 unidades.', precio:8000, orden:1},
+  {id:'churros-l', cat:'Postres', nombre:'Churros talla L', desc:'16 unidades.', precio:15000, orden:2},
+  {id:'churros-xl', cat:'Postres', nombre:'Churros talla XL', desc:'24 unidades.', precio:22000, orden:3}
 ];
 
 const CORTE = 5;   // la jornada del panel va de 5:00 a. m. a 5:00 a. m. (los pedidos de madrugada cuentan para la noche anterior)
@@ -395,7 +405,9 @@ function itemHTML(p){
     <div class="item-txt">
       <h3>${esc(p.nombre)}</h3>
       ${p.desc ? `<p>${esc(p.desc)}</p>` : ''}
-      <div class="item-price">${p.variantes?.length ? '<small>Desde </small>' : ''}${fmt(minPrice(p))}${off ? '<span class="agotado">Agotado</span>' : ''}</div>
+      ${p.variantes?.length
+        ? `<div class="vchips">${p.variantes.map((v, i) => `<button class="vchip" data-act="open" data-id="${esc(p.id)}" data-vi="${i}" ${off ? 'disabled' : ''}>${esc(v.n)} <b>${fmt(v.p)}</b></button>`).join('')}</div>${off ? '<div class="item-price"><span class="agotado" style="margin:0">Agotado</span></div>' : ''}`
+        : `<div class="item-price">${fmt(p.precio)}${off ? '<span class="agotado">Agotado</span>' : ''}</div>`}
     </div>
     ${p.foto
       ? `<div class="ph"><img src="${esc(p.foto)}" alt="" loading="lazy">${off ? '' : '<span class="plus" aria-hidden="true">+</span>'}${qty}</div>`
@@ -416,10 +428,11 @@ function setupSpy(){
 }
 
 /* ---- hoja de producto ---- */
-function openSheet(id){
+function openSheet(id, vi = 0){
   const p = S.menu.find(x => x.id === id); if (!p) return;
   if (p.disponible === false){ toast('Este producto está agotado por hoy'); return; }
-  S.sheet = {id, vi: 0, cant: 1};
+  if (!(p.variantes?.length > vi)) vi = 0;
+  S.sheet = {id, vi, cant: 1};
   const hasV = p.variantes?.length;
   sheetEl.innerHTML = `
     <div class="overlay" data-act="closeSheet"></div>
@@ -430,14 +443,14 @@ function openSheet(id){
         <div class="sheet-body">
           <h2>${esc(p.nombre)}</h2>
           ${p.desc ? `<p class="sheet-desc">${esc(p.desc)}</p>` : ''}
-          ${hasV ? `<h4>Elige una opción</h4><div class="vars">${p.variantes.map((v, i) => `<button class="var${i === 0 ? ' on' : ''}" data-act="var" data-i="${i}"><span class="radio"></span><span class="var-n">${esc(v.n)}</span><b>${fmt(v.p)}</b></button>`).join('')}</div>` : ''}
+          ${hasV ? `<h4>Elige una opción</h4><div class="vars">${p.variantes.map((v, i) => `<button class="var${i === vi ? ' on' : ''}" data-act="var" data-i="${i}"><span class="radio"></span><span class="var-n">${esc(v.n)}</span><b>${fmt(v.p)}</b></button>`).join('')}</div>` : ''}
           <h4>¿Alguna indicación?</h4>
           <textarea id="s-nota" rows="2" maxlength="140" placeholder="Ej: sin cebolla, salsas aparte"></textarea>
         </div>
       </div>
       <div class="sheet-foot">
         <div class="step"><button data-act="sdec" aria-label="Quitar uno">−</button><span id="s-cant">1</span><button data-act="sinc" aria-label="Agregar uno">+</button></div>
-        <button class="cta" data-act="addCart"><span>Agregar</span><span id="s-total">${fmt(hasV ? p.variantes[0].p : p.precio)}</span></button>
+        <button class="cta" data-act="addCart"><span>Agregar</span><span id="s-total">${fmt(hasV ? p.variantes[vi].p : p.precio)}</span></button>
       </div>
     </div>`;
   document.body.classList.add('lock');
@@ -538,8 +551,8 @@ function renderCart(){
       </section>
 
       <div id="err" class="err" role="alert"></div>
-      <button class="send" id="sendBtn" data-act="send">${ICON.chat}Enviar pedido por WhatsApp</button>
-      <p class="fine">Se abre WhatsApp con tu pedido escrito. Solo toca <b>Enviar</b>.</p>
+      <button class="send" id="sendBtn" data-act="send">${ICON.check}Hacer pedido</button>
+      <p class="fine">Te confirmamos por WhatsApp al celular que escribiste.</p>
     </div>
   </div>`;
 }
@@ -606,31 +619,44 @@ async function enviar(){
   errEl.innerHTML = '';
   const order = buildOrder();
   const url = `https://api.whatsapp.com/send?phone=${waNum(S.cfg.whatsapp)}&text=${encodeURIComponent(buildMsg(order))}`;
-  btn.disabled = true; btn.innerHTML = 'Enviando pedido…';
+  btn.disabled = true; btn.innerHTML = 'Enviando tu pedido…';
+  let guardado = false;
   if (FB_ON){
     try {
       await withTimeout((async () => {
         if (S.fbReady) await S.fbReady;
         const {collection, addDoc, serverTimestamp} = fb.fs;
         await addDoc(collection(fb.db, 'pedidos'), {...order, fecha: serverTimestamp()});
-      })(), 4000);
+      })(), 8000);
+      guardado = true;
     } catch (err){ console.warn('No se guardó en la nube:', err); }
   }
-  S.last = {num: order.num, total: order.total, domPend: order.domPendiente, url, t: Date.now()};
+  if (guardado) avisarDueno(order);
+  S.last = {num: order.num, total: order.total, domPend: order.domPendiente, url, tel: order.cliente.tel, modo: guardado ? 'ok' : 'wa', t: Date.now()};
   try { sessionStorage.setItem('c121_last', JSON.stringify(S.last)); } catch (x){}
   S.cart = []; saveCart(); S.cli.obs = ''; S.cli.pagaCon = ''; S.cli.ubic = '';
   S.view = 'done'; render(); window.scrollTo(0, 0);
-  setTimeout(() => { location.href = url; }, 350);
+  if (!guardado) setTimeout(() => { location.href = url; }, 600);
+}
+// Aviso automático al WhatsApp del negocio (CallMeBot, gratis). Se activa poniendo la clave en Ajustes del panel.
+function avisarDueno(order){
+  const key = String(S.cfg.cmbKey || '').trim(); if (!key) return;
+  const panel = new URL('panel.html', location.href).href;
+  const texto = buildMsg(order) + `\n\nVer en el panel: ${panel}`;
+  const url = `https://api.callmebot.com/whatsapp.php?phone=%2B${waNum(S.cfg.whatsapp)}&apikey=${encodeURIComponent(key)}&text=${encodeURIComponent(texto)}`;
+  try { fetch(url, {mode: 'no-cors', keepalive: true}).catch(() => {}); } catch (x){}
 }
 function renderDone(){
   const l = S.last || {};
+  const ok = l.modo !== 'wa';
   main.innerHTML = `<div class="shell"><div class="done">
     <div class="okmark">${ICON.check}</div>
-    <h1>Tu pedido está listo</h1>
-    <p>Se abrió WhatsApp con el pedido escrito. Toca <b>Enviar</b> en el chat para que nos llegue y te confirmemos.</p>
+    <h1>${ok ? '¡Pedido recibido!' : 'Envíanos tu pedido'}</h1>
+    ${ok
+      ? `<p>Ya nos llegó tu pedido. En unos minutos te escribimos por WhatsApp${l.tel ? ` al <b>${esc(prettyTel(l.tel))}</b>` : ''} para confirmarlo.</p>`
+      : '<p>No pudimos registrar el pedido desde la página. Te abrimos WhatsApp con el pedido escrito: toca <b>Enviar</b> para que nos llegue.</p>'}
     <div class="ticket-w"><div class="ticket"><span>Pedido</span><div class="num">#${esc(l.num)}</div><span>Total ${fmt(l.total)}${l.domPend ? ' + domicilio' : ''}</span></div></div>
-    <a class="send" href="${esc(l.url)}">${ICON.chat}Abrir WhatsApp otra vez</a>
-    <button class="linkbtn" data-act="toMenu">Hacer otro pedido</button>
+    ${ok ? '<button class="send" data-act="toMenu">Hacer otro pedido</button>' : `<a class="send" href="${esc(l.url)}">${ICON.chat}Abrir WhatsApp</a><button class="linkbtn" data-act="toMenu">Hacer otro pedido</button>`}
   </div></div>`;
 }
 function pedirUbicacion(){
@@ -684,7 +710,7 @@ document.addEventListener('click', async e => {
   const act = el.dataset.act, id = el.dataset.id;
   switch (act){
     // cliente
-    case 'open': openSheet(id); break;
+    case 'open': openSheet(id, +(el.dataset.vi || 0)); break;
     case 'closeSheet': closeSheet(); break;
     case 'var': S.sheet.vi = +el.dataset.i; sheetUpdate(); break;
     case 'sinc': S.sheet.cant = Math.min(50, S.sheet.cant + 1); sheetUpdate(); break;

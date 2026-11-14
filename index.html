@@ -202,6 +202,11 @@ a{color:inherit}
 .done .num{font-family:var(--display);font-style:italic;font-weight:900;font-size:44px;margin:4px 0}
 .done .ticket span{color:var(--tinta2);font-size:14px;font-weight:600}
 .done .send{max-width:360px;margin:26px auto 0}
+.payinfo{margin:22px auto 0;max-width:340px;border:1.5px solid var(--oro-viejo);border-radius:16px;padding:14px 16px;text-align:left;background:var(--panel)}
+.payinfo > span{display:block;color:var(--texto2);font-size:14.5px;line-height:1.4;margin-bottom:8px}
+.payinfo div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed var(--linea)}
+.payinfo small{color:var(--gris);font-size:14px}
+.payinfo b{color:var(--crema2);font-size:15.5px}
 .linkbtn{display:block;margin:16px auto 0;font-weight:700;text-decoration:underline;text-underline-offset:3px;font-size:15.5px;color:var(--crema)}
 
 .toast{position:fixed;left:50%;top:14px;transform:translate(-50%,-160%);opacity:0;visibility:hidden;z-index:90;background:var(--crema);color:var(--tinta);padding:12px 18px;border-radius:14px;font-weight:800;font-size:15px;box-shadow:0 10px 30px -10px rgba(0,0,0,.8);max-width:calc(100% - 28px);text-align:center;transition:transform .25s ease,opacity .25s ease,visibility .25s}
@@ -254,6 +259,7 @@ const DEFAULT_CONFIG = {
   recoger: true,
   categorias: ['Salchipapas', 'Perros calientes', 'Hamburguesas', 'Chuzos desgranados', 'Adicionales', 'Postres'],
   nequi: '', daviplata: '', breb: '', bancolombia: '',
+  waTras: 'siempre',   // abrir WhatsApp al cliente con el pedido escrito: 'siempre' | 'transferencia' | 'nunca'
   cmbKey: ''   // clave de CallMeBot para el aviso automático a tu WhatsApp (se pone en Ajustes del panel)
 };
 
@@ -543,7 +549,7 @@ function renderCart(){
       <section class="fsec"><h3>Pago</h3>
         <div class="pays" role="radiogroup">${pays.map(p => `<button class="pay ${c.pago === p.id ? 'on' : ''}" data-act="pago" data-v="${p.id}" role="radio" aria-checked="${c.pago === p.id}"><span class="radio"></span><span><b>${esc(p.label)}</b>${p.info ? `<small>${esc(p.info)}</small>` : ''}</span></button>`).join('')}</div>
         ${c.pago === 'efectivo' ? `<label class="f" style="margin-top:12px"><span>¿Con cuánto vas a pagar?</span><input class="money" data-k="pagaCon" inputmode="numeric" value="${esc(c.pagaCon)}" placeholder="Ej: 50.000 (para llevarte el cambio)"></label>` : ''}
-        ${c.pago && c.pago !== 'efectivo' ? `<p class="hint">Cuando envíes el pedido, mándanos el comprobante por el mismo chat.</p>` : ''}
+        ${c.pago && c.pago !== 'efectivo' ? `<p class="hint">${abreWA(c.pago) ? 'Al tocar <b>Hacer pedido</b> se abre WhatsApp con tu pedido escrito: envíanos ahí el comprobante del pago.' : 'Te confirmamos el total por WhatsApp y ahí nos envías el comprobante.'}</p>` : ''}
       </section>
 
       <section class="fsec"><h3>Comentarios</h3>
@@ -551,8 +557,8 @@ function renderCart(){
       </section>
 
       <div id="err" class="err" role="alert"></div>
-      <button class="send" id="sendBtn" data-act="send">${ICON.check}Hacer pedido</button>
-      <p class="fine">Te confirmamos por WhatsApp al celular que escribiste.</p>
+      <button class="send" id="sendBtn" data-act="send">${abreWA(c.pago) ? ICON.chat + 'Hacer pedido por WhatsApp' : ICON.check + 'Hacer pedido'}</button>
+      <p class="fine">${abreWA(c.pago) ? 'Se abre WhatsApp con tu pedido escrito. Solo toca <b>Enviar</b>.' : 'Te confirmamos por WhatsApp al celular que escribiste.'}</p>
     </div>
   </div>`;
 }
@@ -618,7 +624,9 @@ async function enviar(){
   if (e.length){ errEl.innerHTML = e.length === 1 ? esc(e[0]) : `<ul>${e.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`; errEl.scrollIntoView({behavior: 'smooth', block: 'center'}); return; }
   errEl.innerHTML = '';
   const order = buildOrder();
-  const url = `https://api.whatsapp.com/send?phone=${waNum(S.cfg.whatsapp)}&text=${encodeURIComponent(buildMsg(order))}`;
+  const transfer = order.pago !== 'efectivo';
+  const msg = buildMsg(order) + (transfer ? '\n\n📎 Te envío el comprobante del pago.' : '');
+  const url = `https://api.whatsapp.com/send?phone=${waNum(S.cfg.whatsapp)}&text=${encodeURIComponent(msg)}`;
   btn.disabled = true; btn.innerHTML = 'Enviando tu pedido…';
   let guardado = false;
   if (FB_ON){
@@ -626,17 +634,25 @@ async function enviar(){
       await withTimeout((async () => {
         if (S.fbReady) await S.fbReady;
         const {collection, addDoc, serverTimestamp} = fb.fs;
-        await addDoc(collection(fb.db, 'pedidos'), {...order, fecha: serverTimestamp()});
-      })(), 8000);
+        await addDoc(collection(fb.db, 'pedidos'), {...order, enVentas: false, fecha: serverTimestamp()});
+      })(), 6000);
       guardado = true;
     } catch (err){ console.warn('No se guardó en la nube:', err); }
   }
-  if (guardado) avisarDueno(order);
-  S.last = {num: order.num, total: order.total, domPend: order.domPendiente, url, tel: order.cliente.tel, modo: guardado ? 'ok' : 'wa', t: Date.now()};
+  const abrir = !guardado || abreWA(order.pago);
+  if (guardado && !abrir) avisarDueno(order);
+  S.last = {num: order.num, total: order.total, domPend: order.domPendiente, url, tel: order.cliente.tel, transfer, modo: !guardado ? 'wa' : abrir ? 'enviar' : 'ok', t: Date.now()};
   try { sessionStorage.setItem('c121_last', JSON.stringify(S.last)); } catch (x){}
   S.cart = []; saveCart(); S.cli.obs = ''; S.cli.pagaCon = ''; S.cli.ubic = '';
   S.view = 'done'; render(); window.scrollTo(0, 0);
-  if (!guardado) setTimeout(() => { location.href = url; }, 600);
+  if (abrir) setTimeout(() => { location.href = url; }, 700);
+}
+// ¿Se abre WhatsApp al cliente después del pedido? Se cambia en Ajustes del panel.
+function abreWA(pago){
+  const modo = S.cfg.waTras || 'siempre';
+  if (modo === 'siempre') return true;
+  if (modo === 'nunca') return false;
+  return !!pago && pago !== 'efectivo';
 }
 // Aviso automático al WhatsApp del negocio (CallMeBot, gratis). Se activa poniendo la clave en Ajustes del panel.
 function avisarDueno(order){
@@ -648,16 +664,26 @@ function avisarDueno(order){
 }
 function renderDone(){
   const l = S.last || {};
-  const ok = l.modo !== 'wa';
+  const modo = l.modo || 'ok';
+  const titulo = modo === 'ok' ? '¡Pedido recibido!' : modo === 'enviar' ? (l.transfer ? 'Último paso: el comprobante' : 'Último paso: envíalo') : 'Envíanos tu pedido';
+  const texto = modo === 'ok'
+    ? `Ya nos llegó tu pedido. En unos minutos te escribimos por WhatsApp${l.tel ? ` al <b>${esc(prettyTel(l.tel))}</b>` : ''} para confirmarlo.`
+    : modo === 'enviar'
+      ? (l.transfer ? 'Tu pedido ya quedó registrado. Te abrimos WhatsApp con el pedido escrito: toca <b>Enviar</b> y después mándanos ahí la foto del comprobante del pago.' : 'Tu pedido ya quedó registrado. Te abrimos WhatsApp con el pedido escrito: toca <b>Enviar</b> para confirmarlo.')
+      : 'No pudimos registrar el pedido desde la página. Te abrimos WhatsApp con el pedido escrito: toca <b>Enviar</b> para que nos llegue.';
   main.innerHTML = `<div class="shell"><div class="done">
-    <div class="okmark">${ICON.check}</div>
-    <h1>${ok ? '¡Pedido recibido!' : 'Envíanos tu pedido'}</h1>
-    ${ok
-      ? `<p>Ya nos llegó tu pedido. En unos minutos te escribimos por WhatsApp${l.tel ? ` al <b>${esc(prettyTel(l.tel))}</b>` : ''} para confirmarlo.</p>`
-      : '<p>No pudimos registrar el pedido desde la página. Te abrimos WhatsApp con el pedido escrito: toca <b>Enviar</b> para que nos llegue.</p>'}
+    <div class="okmark">${modo === 'ok' ? ICON.check : ICON.chat}</div>
+    <h1>${titulo}</h1>
+    <p>${texto}</p>
+    ${modo === 'enviar' && l.transfer ? pagoInfoHTML(l.total, l.domPend) : ''}
     <div class="ticket-w"><div class="ticket"><span>Pedido</span><div class="num">#${esc(l.num)}</div><span>Total ${fmt(l.total)}${l.domPend ? ' + domicilio' : ''}</span></div></div>
-    ${ok ? '<button class="send" data-act="toMenu">Hacer otro pedido</button>' : `<a class="send" href="${esc(l.url)}">${ICON.chat}Abrir WhatsApp</a><button class="linkbtn" data-act="toMenu">Hacer otro pedido</button>`}
+    ${modo === 'ok' ? '<button class="send" data-act="toMenu">Hacer otro pedido</button>' : `<a class="send" href="${esc(l.url)}">${ICON.chat}Abrir WhatsApp</a><button class="linkbtn" data-act="toMenu">Hacer otro pedido</button>`}
   </div></div>`;
+}
+function pagoInfoHTML(total, domPend){
+  const c = S.cfg, cuentas = [['Nequi', c.nequi], ['Daviplata', c.daviplata], ['Bre-B (llave)', c.breb], ['Bancolombia', c.bancolombia]].filter(x => x[1]);
+  if (!cuentas.length) return '';
+  return `<div class="payinfo"><span>${domPend ? 'Te confirmamos el valor del domicilio por WhatsApp. ' : ''}Paga ${fmt(total)}${domPend ? ' + domicilio' : ''} a:</span>${cuentas.map(([n, v]) => `<div><small>${esc(n)}</small><b>${esc(v)}</b></div>`).join('')}</div>`;
 }
 function pedirUbicacion(){
   if (!navigator.geolocation){ toast('Tu teléfono no permite compartir la ubicación desde aquí'); return; }

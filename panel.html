@@ -385,6 +385,9 @@ body.is-admin{background:#FAF7F0}
 .vc-x span{flex:1;font-size:11.5px;color:var(--gris);text-align:center;min-width:0;white-space:nowrap;overflow:visible}
 .tip{position:absolute;z-index:95;display:none;background:var(--carbon);color:var(--blanco);font-size:13px;font-weight:700;padding:6px 10px;border-radius:8px;pointer-events:none;white-space:nowrap;box-shadow:0 6px 16px -6px rgba(0,0,0,.4)}
 .o-badges{display:flex;gap:6px;align-items:center}
+.tag-pend{font-size:12px;font-weight:800;color:#8A5A00;background:#FFF1C7;padding:4px 9px;border-radius:99px}
+.lst-pend{border-color:#E9C96A;background:#FFFCF0}
+.stat-pend{border-color:#E9C96A;background:#FFFAEA}
 .tag-ok{font-size:12px;font-weight:800;color:var(--verde2);background:#E3F5EA;padding:4px 9px;border-radius:99px}
 @media (max-width:560px){
   .crow{grid-template-columns:1fr 62px 76px}
@@ -469,6 +472,7 @@ const DEFAULT_CONFIG = {
   recoger: true,
   categorias: ['Salchipapas', 'Perros calientes', 'Hamburguesas', 'Chuzos desgranados', 'Adicionales', 'Postres'],
   nequi: '', daviplata: '', breb: '', bancolombia: '',
+  waTras: 'siempre',   // abrir WhatsApp al cliente con el pedido escrito: 'siempre' | 'transferencia' | 'nunca'
   cmbKey: ''   // clave de CallMeBot para el aviso automático a tu WhatsApp (se pone en Ajustes del panel)
 };
 
@@ -566,7 +570,7 @@ const NEXT_BTN = {preparando:'Empezar a preparar', camino:'Despachar', entregado
 function jornadaStr(d){ const x = new Date(d); if (x.getHours() < CORTE) x.setDate(x.getDate() - 1); const p = n => String(n).padStart(2, '0'); return `${x.getFullYear()}-${p(x.getMonth() + 1)}-${p(x.getDate())}`; }
 const clientLink = () => new URL('./', location.href).href;
 const hhmm = d => d.toLocaleTimeString('es-CO', {hour: 'numeric', minute: '2-digit'});
-const A = {tab:'pedidos', fecha: jornadaStr(new Date()), filtro:'todos', pedidos:[], prods:[], cfg:{...DEFAULT_CONFIG}, unsub:{}, edit:null, started:false,
+const A = {tab:'pedidos', fecha: jornadaStr(new Date()), filtro:'todos', pedidos:[], prods:[], cfg:{...DEFAULT_CONFIG}, unsub:{}, edit:null, started:false, base:{prods:false, ins:false, rec:false}, cola: new Map(),
   ventas:[], insumos:[], recetas:{}, compras:[], gastos:[], mes: mesActual(), modal:null, rep:{periodo:'mes', desde:'', hasta:'', data:null, loading:false}};
 
 async function adminBoot(){
@@ -623,9 +627,10 @@ function adminStart(){
   }, e => toast('Sin permiso para leer ajustes: ' + e.code));
   A.unsub.prods = onSnapshot(collection(fb.db, 'productos'), s => {
     A.prods = s.docs.map(d => ({id: d.id, ...d.data()}));
+    A.base.prods = true; procesarCola();
     if (A.tab === 'menu') renderAdminBody();
   }, e => toast('Sin permiso para leer el menú: ' + e.code));
-  subPedidos(); subVentas(); subMes(); subBase();
+  subPedidos(); subVentas(); subMes(); subBase(); subPendientes();
   keepAwake();
 }
 function subPedidos(){
@@ -661,7 +666,7 @@ function renderAdmin(){
 function updateTabBadge(){
   const t = $('#a-tabs'); if (!t) return;
   const n = A.pedidos.filter(p => p.estado === 'nuevo').length;
-  t.innerHTML = [['pedidos', 'Pedidos'], ['ventas', 'Ventas'], ['inventario', 'Inventario'], ['compras', 'Compras'], ['gastos', 'Gastos'], ['reportes', 'Reportes'], ['menu', 'Menú'], ['ajustes', 'Ajustes']].map(([k, l]) => `<button class="${A.tab === k ? 'on' : ''}" data-act="a-tab" data-v="${k}">${l}${k === 'pedidos' && n ? `<i class="dotn">${n}</i>` : ''}</button>`).join('');
+  t.innerHTML = [['pedidos', 'Pedidos'], ['ventas', 'Ventas'], ['inventario', 'Inventario'], ['compras', 'Compras'], ['gastos', 'Gastos'], ['reportes', 'Reportes'], ['menu', 'Menú'], ['ajustes', 'Ajustes']].map(([k, l]) => `<button class="${A.tab === k ? 'on' : ''}" data-act="a-tab" data-v="${k}">${l}${k === 'pedidos' && n ? `<i class="dotn">${n}</i>` : ''}${k === 'ventas' && A.ventas.some(esPend) ? `<i class="dotn" style="background:#C98A00">${A.ventas.filter(esPend).length}</i>` : ''}</button>`).join('');
   document.title = (n ? `(${n}) ` : '') + 'Panel · ' + (A.cfg.nombre || DEFAULT_CONFIG.nombre);
 }
 function renderAdminBody(){
@@ -700,7 +705,7 @@ function orderCard(p){
   const hora = p.fecha?.toDate ? p.fecha.toDate() : new Date(p.creado || Date.now());
   const nx = NEXT[p.estado];
   return `<article class="ocard st-${esc(p.estado)}" style="--c:${e.c}">
-    <div class="o-head"><div><b>#${esc(p.num)}</b><span class="hora">${hhmm(hora)}</span></div><div class="o-badges">${A.ventas.some(v => v.id === 'p_' + p.id) ? '<span class="tag-ok">En ventas</span>' : ''}<span class="badge">${esc(estLabel(p.estado, p.entrega))}</span></div></div>
+    <div class="o-head"><div><b>#${esc(p.num)}</b><span class="hora">${hhmm(hora)}</span></div><div class="o-badges">${(() => { const v = A.ventas.find(x => x.id === 'p_' + p.id); return !v ? '' : esPend(v) ? '<span class="tag-pend">Venta por aprobar</span>' : '<span class="tag-ok">Venta aprobada</span>'; })()}<span class="badge">${esc(estLabel(p.estado, p.entrega))}</span></div></div>
     <div class="o-cli"><b>${esc(c.nombre)}</b>, <a href="tel:${digits(c.tel)}">${esc(prettyTel(c.tel))}</a></div>
     <div class="o-dir">${p.entrega === 'domicilio'
       ? `${esc(c.dir)}, ${esc(c.barrio)}${c.ref ? `. ${esc(c.ref)}` : ''}${c.ubic ? `. <a href="${esc(c.ubic)}" target="_blank" rel="noopener">Ver en el mapa</a>` : ''}`
@@ -729,7 +734,9 @@ async function setEstado(id, estado){
   const {doc, updateDoc, serverTimestamp} = fb.fs;
   try {
     await updateDoc(doc(fb.db, 'pedidos', id), {estado, ['t_' + estado]: serverTimestamp()});
-    if (estado === 'entregado'){ const p = A.pedidos.find(x => x.id === id); if (p){ await ventaDesdePedido(p); toast('Entregado y sumado a las ventas'); } }
+    const p = A.pedidos.find(x => x.id === id);
+    if (estado === 'entregado' && p){ await ventaDesdePedido(p); await aprobarVenta('p_' + id); toast('Entregado: venta aprobada'); }
+    if (estado === 'cancelado'){ if (await quitarVentaDePedido(id)) toast('Pedido cancelado y quitado de las ventas'); else toast('Pedido cancelado'); }
   } catch (e){ toast('No se pudo cambiar el estado: ' + (e.code || e.message)); }
 }
 let actx;
@@ -927,7 +934,7 @@ function subRango(key, col, rango, cb){
   A.unsub[key] = onSnapshot(query(collection(fb.db, col), where('fecha', '>=', Timestamp.fromDate(rango[0])), where('fecha', '<', Timestamp.fromDate(rango[1])), orderBy('fecha', 'desc')),
     s => cb(s.docs.map(d => ({id: d.id, ...d.data()}))), e => toast(`No se pudo leer ${col}: ${e.code}`));
 }
-function subVentas(){ subRango('ven', 'ventas', rangoJornada(A.fecha), r => { A.ventas = r; if (A.tab === 'ventas' || A.tab === 'pedidos') renderAdminBody(); }); }
+function subVentas(){ subRango('ven', 'ventas', rangoJornada(A.fecha), r => { A.ventas = r; updateTabBadge(); if (A.tab === 'ventas' || A.tab === 'pedidos') renderAdminBody(); }); }
 function subMes(){
   const r = rangoMes(A.mes);
   subRango('com', 'compras', r, x => { A.compras = x; if (A.tab === 'compras' || A.tab === 'gastos' || A.tab === 'inventario') renderAdminBody(); });
@@ -937,12 +944,37 @@ function subBase(){
   const {collection, onSnapshot} = fb.fs;
   A.unsub.ins = onSnapshot(collection(fb.db, 'insumos'), s => {
     A.insumos = s.docs.map(d => ({id: d.id, ...d.data()})).sort((a, b) => String(a.nombre).localeCompare(String(b.nombre)));
+    A.base.ins = true; procesarCola();
     if (A.tab === 'inventario' || A.tab === 'menu') renderAdminBody();
   }, e => toast('No se pudo leer el inventario: ' + e.code));
   A.unsub.rec = onSnapshot(collection(fb.db, 'recetas'), s => {
     A.recetas = {}; s.docs.forEach(d => { A.recetas[d.id] = d.data(); });
+    A.base.rec = true; procesarCola();
     if (A.tab === 'menu') renderAdminBody();
-  }, () => {});
+  }, () => { A.base.rec = true; procesarCola(); });
+}
+// Cada pedido nuevo del link se registra como venta apenas llega (no hay que esperar a "Entregado").
+function subPendientes(){
+  const {collection, query, where, onSnapshot} = fb.fs;
+  A.unsub.pend = onSnapshot(query(collection(fb.db, 'pedidos'), where('enVentas', '==', false)), s => {
+    s.docs.forEach(d => A.cola.set(d.id, {id: d.id, ...d.data()}));
+    procesarCola();
+  }, e => console.warn('pendientes', e));
+}
+let procesando = false;
+async function procesarCola(){
+  if (procesando || !A.cola.size || !(A.base.prods && A.base.ins && A.base.rec)) return;
+  procesando = true;
+  try {
+    for (const [id, p] of [...A.cola]){
+      A.cola.delete(id);
+      try {
+        if (p.estado === 'cancelado'){ await fb.fs.updateDoc(fb.fs.doc(fb.db, 'pedidos', id), {enVentas: true}); continue; }
+        await ventaDesdePedido(p);
+      } catch (e){ console.warn('No se pudo registrar la venta del pedido', id, e); }
+    }
+  } finally { procesando = false; }
+  if (A.cola.size) procesarCola();
 }
 
 /* ---- ventanas (modales) ---- */
@@ -978,29 +1010,60 @@ async function registrarVenta(v, id){
   const {doc, collection, writeBatch, increment} = fb.fs;
   const c = costear(v.items), b = writeBatch(fb.db);
   const ref = id ? doc(fb.db, 'ventas', id) : doc(collection(fb.db, 'ventas'));
-  b.set(ref, {...v, items: c.items, costo: c.costo, consumo: c.consumo});
+  b.set(ref, {...v, estado: 'aprobada', items: c.items, costo: c.costo, consumo: c.consumo});
   Object.entries(c.consumo).forEach(([iid, q]) => b.update(doc(fb.db, 'insumos', iid), {stock: increment(-q)}));
   await b.commit();
 }
+const esPend = v => v.estado === 'pendiente';
+const aprobadas = list => list.filter(v => !esPend(v));
 function pagoNorm(id, label){ return ({efectivo: 'Efectivo', nequi: 'Nequi', daviplata: 'Daviplata', breb: 'Bre-B', bancolombia: 'Transferencia', transferencia: 'Transferencia'})[id] || label || 'Efectivo'; }
 async function ventaDesdePedido(p){
-  const {doc, getDoc, Timestamp} = fb.fs, id = 'p_' + p.id;
-  if (A.ventas.some(v => v.id === id)) return;
-  if ((await getDoc(doc(fb.db, 'ventas', id))).exists()) return;
-  await registrarVenta({
+  const {doc, runTransaction, increment, Timestamp} = fb.fs, id = 'p_' + p.id;
+  const v = {
     fecha: p.fecha || Timestamp.fromDate(new Date()), canal: 'Link de pedidos', pago: pagoNorm(p.pago, p.pagoLabel),
     items: (p.items || []).map(i => ({id: i.id || '', nombre: i.nombre || '', variante: i.variante || '', cant: +i.cant || 0, precio: +i.precio || 0})),
     subtotal: +p.subtotal || 0, domicilio: +p.domicilio || 0, descuento: 0, total: +p.total || 0,
     cliente: p.cliente?.nombre || '', pedidoId: p.id, pedidoNum: p.num || '', nota: ''
-  }, id);
+  };
+  const c = costear(v.items), vref = doc(fb.db, 'ventas', id), pref = doc(fb.db, 'pedidos', p.id);
+  return runTransaction(fb.db, async tx => {
+    const ya = await tx.get(vref);
+    if (!ya.exists()) tx.set(vref, {...v, estado: 'pendiente', items: c.items, costo: c.costo, consumo: {}});
+    tx.update(pref, {enVentas: true});
+    return !ya.exists();
+  });
+}
+// Aprobar: la venta cuenta en los reportes y descuenta el inventario según la receta. El pedido queda entregado.
+async function aprobarVenta(id){
+  const {doc, runTransaction, increment, serverTimestamp} = fb.fs, vref = doc(fb.db, 'ventas', id);
+  return runTransaction(fb.db, async tx => {
+    const s = await tx.get(vref); if (!s.exists()) return false;
+    const v = s.data(); if (!esPend(v)) return false;
+    const c = costear(v.items || []);
+    tx.update(vref, {estado: 'aprobada', aprobadaEn: serverTimestamp(), items: c.items, costo: c.costo, consumo: c.consumo});
+    Object.entries(c.consumo).forEach(([iid, q]) => { if (A.insumos.some(x => x.id === iid)) tx.update(doc(fb.db, 'insumos', iid), {stock: increment(-q)}); });
+    if (v.pedidoId) tx.update(doc(fb.db, 'pedidos', v.pedidoId), {estado: 'entregado', t_entregado: serverTimestamp()});
+    return true;
+  });
+}
+// Si se cancela un pedido que ya estaba en ventas, se quita de las ventas y los insumos vuelven al inventario.
+async function quitarVentaDePedido(pid){
+  const {doc, runTransaction, increment} = fb.fs, vref = doc(fb.db, 'ventas', 'p_' + pid);
+  return runTransaction(fb.db, async tx => {
+    const s = await tx.get(vref); if (!s.exists()) return false;
+    if (!esPend(s.data())) Object.entries(s.data().consumo || {}).forEach(([iid, q]) => { if (A.insumos.some(x => x.id === iid)) tx.update(doc(fb.db, 'insumos', iid), {stock: increment(q)}); });
+    tx.delete(vref);
+    return true;
+  });
 }
 
 /* ---- VENTAS ---- */
 function porClave(list, kf, vf){ const m = {}; list.forEach(x => { const k = kf(x) || 'Sin dato'; m[k] = (m[k] || 0) + (+vf(x) || 0); }); return Object.entries(m).sort((a, b) => b[1] - a[1]); }
 function viewVentas(){
-  const v = A.ventas, tot = v.reduce((a, x) => a + (+x.total || 0), 0), costo = v.reduce((a, x) => a + (+x.costo || 0), 0);
+  const v = aprobadas(A.ventas), pv = A.ventas.filter(esPend);
+  const tot = v.reduce((a, x) => a + (+x.total || 0), 0), costo = v.reduce((a, x) => a + (+x.costo || 0), 0);
+  const ptot = pv.reduce((a, x) => a + (+x.total || 0), 0);
   const conRec = v.some(x => +x.costo > 0), esHoy = A.fecha === isoHoy();
-  const pend = A.pedidos.filter(p => p.estado !== 'entregado' && p.estado !== 'cancelado').length;
   return `
     <div class="a-tools">
       <label>Jornada <input type="date" id="a-fecha" value="${A.fecha}"></label>
@@ -1008,21 +1071,23 @@ function viewVentas(){
       <button class="btn red" data-act="v-new">Registrar venta</button>
     </div>
     <div class="stats">
-      <div class="stat"><small>Vendido</small><b>${fmt(tot)}</b></div>
-      <div class="stat"><small>Ventas</small><b>${v.length}</b></div>
-      <div class="stat"><small>Costo de lo vendido</small><b class="${conRec ? '' : 'sm'}">${conRec ? fmt(costo) : 'Faltan recetas'}</b></div>
+      <div class="stat"><small>Vendido (aprobado)</small><b>${fmt(tot)}</b></div>
+      <div class="stat"><small>Ventas aprobadas</small><b>${v.length}</b></div>
+      <div class="stat ${pv.length ? 'stat-pend' : ''}"><small>Por aprobar${pv.length ? ` (${pv.length})` : ''}</small><b>${fmt(ptot)}</b></div>
       <div class="stat"><small>Ganancia bruta</small><b class="${conRec ? '' : 'sm'}">${conRec ? fmt(tot - costo) : 'Faltan recetas'}</b></div>
     </div>
+    ${pv.length ? `<h3 class="a-cat">Por aprobar</h3><p class="help" style="margin:-4px 2px 10px">Pedidos que hicieron los clientes. Cuando entregues el pedido, toca <b>Aprobar</b>: ahí cuenta como venta y descuenta el inventario.</p><div class="lst lst-pend">${pv.map(ventaRow).join('')}</div>` : ''}
+    <h3 class="a-cat">Ventas aprobadas</h3>
     ${v.length ? `<div class="paybar">${porClave(v, x => x.pago, x => x.total).map(([k, n]) => `<span><small>${esc(k)}</small><b>${fmt(n)}</b></span>`).join('')}</div>` : ''}
-    ${pend && esHoy ? `<p class="note">Tienes ${pend} pedido${pend > 1 ? 's' : ''} del link sin entregar. Se suman aquí cuando los marques como entregados.</p>` : ''}
-    <div class="lst">${v.length ? v.map(ventaRow).join('') : '<div class="li empty-li">No hay ventas en esta jornada. Los pedidos del link entran solos al marcarlos como entregados. Las ventas por otros canales (Rappi, WhatsApp, local) regístralas con el botón.</div>'}</div>`;
+    <div class="lst">${v.length ? v.map(ventaRow).join('') : '<div class="li empty-li"><span>Todavía no hay ventas aprobadas en esta jornada. Los pedidos del link llegan arriba como <b>Por aprobar</b>. Las ventas por otros canales (Rappi, WhatsApp, local) regístralas con el botón <b>Registrar venta</b>.</span></div>'}</div>`;
 }
 function ventaRow(x){
   const det = (x.items || []).map(i => `${i.cant} ${i.nombre}${i.variante ? ' ' + i.variante.toLowerCase() : ''}`).join(', ');
   return `<div class="li">
     <div class="li-main"><b>${fmt(x.total)}</b><span class="li-meta">${hhmm(dOf(x.fecha))}, ${esc(x.canal)}${x.pedidoNum ? ' #' + esc(x.pedidoNum) : ''}, ${esc(x.pago)}${x.cliente ? ', ' + esc(x.cliente) : ''}</span><span class="li-det">${esc(det)}</span></div>
-    ${+x.costo ? `<span class="li-side">Ganancia ${fmt(x.total - x.costo)}</span>` : ''}
-    <button class="btn sm ghost danger" data-act="v-del" data-id="${x.id}">Anular</button>
+    ${esPend(x)
+      ? `<button class="btn sm red" data-act="v-ok" data-id="${x.id}">Aprobar</button><button class="btn sm ghost danger" data-act="v-del" data-id="${x.id}">Rechazar</button>`
+      : `${+x.costo ? `<span class="li-side">Ganancia ${fmt(x.total - x.costo)}</span>` : ''}<button class="btn sm ghost danger" data-act="v-del" data-id="${x.id}">Anular</button>`}
   </div>`;
 }
 const menuVenta = () => A.prods.length ? A.prods : normMenu(DEFAULT_MENU);
@@ -1076,11 +1141,17 @@ async function saveVenta(){
 }
 async function anularVenta(id){
   const v = A.ventas.find(x => x.id === id); if (!v) return;
-  if (!confirm(`¿Anular esta venta de ${fmt(v.total)}? Los insumos que descontó vuelven al inventario.`)) return;
+  const pend = esPend(v);
+  if (!confirm(pend ? `¿Rechazar este pedido de ${fmt(v.total)}? Se quita de la lista y el pedido queda cancelado.` : `¿Anular esta venta de ${fmt(v.total)}? Los insumos que descontó vuelven al inventario.`)) return;
   const {doc, writeBatch, increment} = fb.fs, b = writeBatch(fb.db);
   b.delete(doc(fb.db, 'ventas', id));
-  Object.entries(v.consumo || {}).forEach(([iid, q]) => { if (A.insumos.some(x => x.id === iid)) b.update(doc(fb.db, 'insumos', iid), {stock: increment(q)}); });
-  try { await b.commit(); toast('Venta anulada'); } catch (e){ toast('No se pudo anular: ' + e.code); }
+  if (!pend) Object.entries(v.consumo || {}).forEach(([iid, q]) => { if (A.insumos.some(x => x.id === iid)) b.update(doc(fb.db, 'insumos', iid), {stock: increment(q)}); });
+  if (v.pedidoId) b.update(doc(fb.db, 'pedidos', v.pedidoId), {estado: 'cancelado', enVentas: true});
+  try { await b.commit(); toast(pend ? 'Pedido rechazado' : v.pedidoId ? 'Venta anulada y pedido cancelado' : 'Venta anulada'); } catch (e){ toast('No se pudo anular: ' + e.code); }
+}
+async function aprobarDesdeVentas(id, el){
+  if (el) el.disabled = true;
+  try { if (await aprobarVenta(id)) toast('Venta aprobada'); } catch (e){ toast('No se pudo aprobar: ' + (e.code || e.message)); if (el) el.disabled = false; }
 }
 
 /* ---- INVENTARIO ---- */
@@ -1336,7 +1407,8 @@ async function cargarReporte(){
   } catch (e){ toast('No se pudo calcular: ' + e.code); A.rep.data = null; }
   A.rep.loading = false; if (A.tab === 'reportes') renderAdminBody();
 }
-function calcReporte(d){
+function calcReporte(d0){
+  const d = {...d0, ventas: aprobadas(d0.ventas)};
   const S_ = (arr, f) => arr.reduce((a, x) => a + (+f(x) || 0), 0);
   const ventas = S_(d.ventas, v => v.total), costo = S_(d.ventas, v => v.costo), dom = S_(d.ventas, v => v.domicilio);
   const compras = S_(d.compras, c => c.total), gastos = S_(d.gastos, g => g.valor);
@@ -1383,10 +1455,11 @@ function viewReportes(){
   const head = `<div class="chips" style="margin-top:0">${per.map(([k, l]) => `<button class="chip ${r.periodo === k ? 'on' : ''}" data-act="r-per" data-v="${k}">${l}</button>`).join('')}</div>
     ${r.periodo === 'rango' ? `<div class="a-tools"><label>Desde <input type="date" id="r-desde" value="${r.desde}"></label><label>Hasta <input type="date" id="r-hasta" value="${r.hasta}"></label><button class="btn sm pri" data-act="r-go">Ver</button></div>` : ''}`;
   if (r.loading || !r.data) return head + '<div class="empty">Calculando…</div>';
-  const k = calcReporte(r.data), hayRec = k.cobertura > 0;
+  const k = calcReporte(r.data), hayRec = k.cobertura > 0, porAprobar = r.data.ventas.filter(esPend);
   const fin = new Date(r.data.b.getTime() - CORTE * 36e5 - 1);
   return head + `
-    <p class="help" style="margin:0 0 12px">Del ${esc(fdia(r.data.a))} al ${esc(fdia(fin))}</p>
+    <p class="help" style="margin:0 0 12px">Del ${esc(fdia(r.data.a))} al ${esc(fdia(fin))}. Solo cuenta ventas aprobadas.</p>
+    ${porAprobar.length ? `<p class="note">Hay ${porAprobar.length} pedido${porAprobar.length > 1 ? 's' : ''} por aprobar (${fmt(porAprobar.reduce((a, x) => a + (+x.total || 0), 0))}) que todavía no cuenta${porAprobar.length > 1 ? 'n' : ''} aquí. Apruébalos en Ventas cuando los entregues.</p>` : ''}
     <div class="stats">
       <div class="stat"><small>Vendido</small><b>${fmt(k.ventas)}</b></div>
       <div class="stat"><small>${hayRec ? 'Ganancia neta' : 'Quedó en caja'}</small><b class="${(hayRec ? k.neta : k.caja) < 0 ? 'neg' : ''}">${fmt(hayRec ? k.neta : k.caja)}</b></div>
@@ -1420,7 +1493,8 @@ function viewReportes(){
     <div class="a-tools" style="margin-top:16px"><button class="btn" data-act="r-csv">Descargar para Excel</button></div>`;
 }
 function exportCSV(){
-  const d = A.rep.data; if (!d) return;
+  const d0 = A.rep.data; if (!d0) return;
+  const d = {...d0, ventas: aprobadas(d0.ventas)};
   const rows = [['Tipo', 'Fecha', 'Hora', 'Detalle', 'Canal / proveedor / categoría', 'Medio de pago', 'Valor', 'Costo']];
   const fh = x => { const f = dOf(x.fecha); return [f.toLocaleDateString('es-CO'), hhmm(f)]; };
   d.ventas.forEach(v => rows.push(['Venta', ...fh(v), (v.items || []).map(i => `${i.cant} ${i.nombre}${i.variante ? ' ' + i.variante : ''}`).join(' + '), v.canal, v.pago, v.total, v.costo || 0]));
@@ -1472,6 +1546,7 @@ function viewAjustes(){
       <label class="f"><span>Valor del domicilio</span><input id="c-domicilio" class="money" inputmode="numeric" value="${c.domicilio ? NF.format(c.domicilio) : ''}" placeholder="Vacío = se confirma por WhatsApp según el barrio"></label>
       <label class="f"><span>Pedido mínimo</span><input id="c-pedidoMinimo" class="money" inputmode="numeric" value="${c.pedidoMinimo ? NF.format(c.pedidoMinimo) : ''}" placeholder="Vacío = sin mínimo"></label>
       <label class="chk"><input type="checkbox" id="c-recoger" ${c.recoger ? 'checked' : ''}>El cliente puede recoger el pedido</label>
+      <label class="f"><span>Abrir WhatsApp al cliente después del pedido</span><select id="c-waTras">${[['siempre', 'Siempre: se abre WhatsApp con el pedido escrito (recomendado)'], ['transferencia', 'Solo si paga por transferencia'], ['nunca', 'Nunca: el pedido solo llega al panel']].map(([v, t]) => `<option value="${v}" ${(c.waTras || 'siempre') === v ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
       <label class="f"><span>Orden de las categorías (una por línea)</span><textarea id="c-categorias" rows="6">${esc((c.categorias || []).join('\n'))}</textarea></label>
     </section>
     <section class="card"><h3>Medios de pago</h3>
@@ -1502,7 +1577,7 @@ async function saveCfg(){
     domicilio: parseMoney(g('domicilio')), pedidoMinimo: parseMoney(g('pedidoMinimo')), recoger: $('#c-recoger').checked,
     categorias: g('categorias').split('\n').map(s => s.trim()).filter(Boolean),
     nequi: g('nequi'), daviplata: g('daviplata'), breb: g('breb'), bancolombia: g('bancolombia'),
-    cmbKey: digits(g('cmbKey')) || g('cmbKey')
+    cmbKey: digits(g('cmbKey')) || g('cmbKey'), waTras: $('#c-waTras')?.value || 'siempre'
   };
   if (telLocal(data.whatsapp).length !== 10) return toast('Revisa el número de WhatsApp: deben ser 10 dígitos');
   const {doc, setDoc} = fb.fs, b = $('#c-save'); b.disabled = true; b.textContent = 'Guardando…';
@@ -1523,7 +1598,7 @@ document.addEventListener('click', async e => {
     case 'a-filtro': A.filtro = el.dataset.v; renderAdminBody(); break;
     case 'a-hoy': A.fecha = jornadaStr(new Date()); subPedidos(); subVentas(); renderAdminBody(); break;
     case 'a-estado': el.disabled = true; await setEstado(id, el.dataset.v); break;
-    case 'a-cancel': if (confirm('¿Cancelar este pedido?')) await setEstado(id, 'cancelado'); break;
+    case 'a-cancel': if (confirm('¿Cancelar este pedido? Se quita de las ventas y los insumos vuelven al inventario.')) await setEstado(id, 'cancelado'); break;
     case 'a-toggle': {
       const {doc, setDoc} = fb.fs, nuevo = !A.cfg.abierto;
       if (!nuevo && !confirm('¿Cerrar? Los clientes no podrán enviar pedidos hasta que vuelvas a abrir.')) break;
@@ -1553,6 +1628,7 @@ document.addEventListener('click', async e => {
     case 'v-pago': case 'c-pago': case 'g-pago': A.modal.pago = el.dataset.v; pillsOn(el); break;
     case 'v-save': saveVenta(); break;
     case 'v-del': anularVenta(id); break;
+    case 'v-ok': aprobarDesdeVentas(id, el); break;
     // inventario
     case 'i-seed': el.disabled = true; await seedInsumos(); break;
     case 'i-new': openInsumo(null); break;
